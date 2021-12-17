@@ -2,7 +2,7 @@ import type { ReactElement } from 'react'
 import { Link } from 'react-router-dom'
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
 
-import logo from '../assets/gatewayLogo.svg'
+import logo from '../assets/FairDataSocietyLogo.svg'
 import * as ROUTES from '../Routes'
 
 const useStyles = makeStyles((theme: Theme) =>
