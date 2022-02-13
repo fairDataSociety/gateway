@@ -30,6 +30,8 @@ RUN echo $PUBLIC_URL >> .env && \
 
 FROM nginx:stable-alpine
 COPY --from=builder /usr/src/app/build /usr/share/nginx/html
+RUN apk add --no-cache bash
+RUN sed -i '/index  index.html index.htm/c\        try_files \$uri \$uri/ /index.html;' /etc/nginx/conf.d/default.conf
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
