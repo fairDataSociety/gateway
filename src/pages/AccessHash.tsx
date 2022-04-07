@@ -4,7 +4,9 @@ import { useParams } from 'react-router-dom'
 import Button from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
 import { RefreshCw, ArrowDown, ExternalLink } from 'react-feather'
+import CircularProgress from '@material-ui/core/CircularProgress'
 import { Utils } from '@ethersphere/bee-js'
+import { encodeManifestReference } from '@ethersphere/swarm-cid'
 
 import Header from '../components/Header'
 import Footer from '../components/Footer'
@@ -15,7 +17,7 @@ import FileNotFound from '../components/FileNotFound'
 import UnknownFile from '../components/UnknownFile'
 import LoadingFile from '../components/LoadingFile'
 import InvalidSwarmHash from '../components/InvalidSwarmHash'
-import { DIRECT_DOWNLOAD_URL } from '../constants'
+import { BZZ_LINK_DOMAIN } from '../constants'
 
 import { Context } from '../providers/bee'
 
@@ -35,11 +37,13 @@ const SharePage = (): ReactElement => {
   const classes = useStyles()
 
   const { hash } = useParams<{ hash: string }>()
+  const bzzLink = `https://${encodeManifestReference(hash!)}.${BZZ_LINK_DOMAIN}/` //eslint-disable-line
   const { getMetadata, getChunk, download } = useContext(Context)
   const [entries, setEntries] = useState<Record<string, string>>({})
   const [metadata, setMetadata] = useState<Metadata | undefined>()
   const [preview, setPreview] = useState<string | undefined>()
   const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [isDownloading, setIsDownloading] = useState<boolean>(false)
   const [chunkExists, setChunkExists] = useState<boolean>(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
@@ -70,6 +74,12 @@ const SharePage = (): ReactElement => {
       })
   }, [hash, getChunk, getMetadata])
 
+  const handleDownload = () => {
+    setIsDownloading(true)
+    // The hash is already validated that is why there can be not a null assertion
+    download(hash!, entries, metadata).finally(() => setIsDownloading(false)) //eslint-disable-line
+  }
+
   if (isLoading) {
     return (
       <Layout
@@ -84,6 +94,21 @@ const SharePage = (): ReactElement => {
           </div>,
         ]}
         bottom={[<div key="bottom1" />]}
+      />
+    )
+  }
+
+  // The hash is wrong, display error message
+  if (errorMsg) {
+    return (
+      <Layout
+        top={[
+          <Header key="top1">
+            <Logo />
+          </Header>,
+        ]}
+        center={[<InvalidSwarmHash key="center" />]}
+        bottom={[]}
       />
     )
   }
@@ -104,12 +129,7 @@ const SharePage = (): ReactElement => {
           <div key="center1">
             <AssetPreview previewUri={preview} metadata={metadata} />
             {metadata?.isWebsite && metadata?.hash && (
-              <Button
-                variant="contained"
-                className={classes.button}
-                href={`${DIRECT_DOWNLOAD_URL}${hash}`}
-                target="blank"
-              >
+              <Button variant="contained" className={classes.button} href={bzzLink} target="blank">
                 <ExternalLink strokeWidth={1} />
                 {text.accessHashPage.openWebsite}
                 <ExternalLink style={{ opacity: 0 }} />
@@ -123,10 +143,11 @@ const SharePage = (): ReactElement => {
               variant="contained"
               className={classes.button}
               size="large"
-              onClick={() => download(hash, entries, metadata)}
+              onClick={handleDownload}
+              disabled={isDownloading}
             >
-              <ArrowDown strokeWidth={1} />
-              {text.accessHashPage.downloadAction}
+              {isDownloading ? <CircularProgress size={24} color="inherit" /> : <ArrowDown strokeWidth={1} />}
+              {isDownloading ? text.accessHashPage.downloadingAction : text.accessHashPage.downloadAction}
               <ArrowDown style={{ opacity: 0 }} />
             </Button>
           </Footer>,
@@ -150,28 +171,19 @@ const SharePage = (): ReactElement => {
         center={[<UnknownFile key="center1" />]}
         bottom={[
           <Footer key="bottom1">
-            <Button variant="contained" className={classes.button} size="large" onClick={() => download(hash, entries)}>
-              <ArrowDown />
-              {text.accessHashPage.downloadAction}
+            <Button
+              variant="contained"
+              className={classes.button}
+              size="large"
+              onClick={handleDownload}
+              disabled={isDownloading}
+            >
+              {isDownloading ? <CircularProgress size={24} color="inherit" /> : <ArrowDown strokeWidth={1} />}
+              {isDownloading ? text.accessHashPage.downloadingAction : text.accessHashPage.downloadAction}
               <ArrowDown style={{ opacity: 0 }} />
             </Button>
           </Footer>,
         ]}
-      />
-    )
-  }
-
-  // The hash is wrong, display error message
-  if (errorMsg) {
-    return (
-      <Layout
-        top={[
-          <Header key="top1">
-            <Logo />
-          </Header>,
-        ]}
-        center={[<InvalidSwarmHash key="center" />]}
-        bottom={[]}
       />
     )
   }

@@ -5,7 +5,7 @@ import Divider from '@material-ui/core/Divider'
 import { ArrowDown, ArrowUp } from 'react-feather'
 import Typography from '@material-ui/core/Typography'
 import Link from '@material-ui/core/Link'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import * as ROUTES from '../Routes'
 
 import Layout from '../components/Layout'
@@ -27,6 +27,7 @@ const useStyles = makeStyles((theme: Theme) =>
       flexWrap: 'wrap',
     },
     spreadItems: {
+      cursor: 'pointer',
       marginLeft: theme.spacing(1),
       marginRight: theme.spacing(1),
     },
@@ -35,7 +36,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const LandingPage = (): ReactElement => {
   const classes = useStyles()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   return (
     <Layout
@@ -53,7 +54,7 @@ const LandingPage = (): ReactElement => {
           className={classes.button}
           size="large"
           variant="contained"
-          onClick={() => history.push(ROUTES.SHARE)}
+          onClick={() => navigate(ROUTES.SHARE)}
         >
           <ArrowUp strokeWidth={1} />
           {text.landingPage.shareAction}
@@ -65,7 +66,7 @@ const LandingPage = (): ReactElement => {
           className={classes.button}
           size="large"
           variant="contained"
-          onClick={() => history.push(ROUTES.ACCESS)}
+          onClick={() => navigate(ROUTES.ACCESS)}
         >
           <ArrowDown strokeWidth={1} />
           {text.landingPage.accessAction}
@@ -79,18 +80,24 @@ const LandingPage = (): ReactElement => {
         </Typography>,
         <Divider key="bottom2" variant="middle" />,
         <small key="bottom3" className={classes.spread}>
-          {text.landingPage.links.map(({ label, link }) => (
-            <Link
-              key={label}
-              className={classes.spreadItems}
-              href={link}
-              color="inherit"
-              underline="always"
-              target="blank"
-            >
-              {label}
-            </Link>
-          ))}
+          {text.landingPage.links.map(({ label, link, internal }) => {
+            let action: { href: string } | { onClick: () => void } = { href: link }
+
+            if (internal) action = { onClick: () => navigate(link) }
+
+            return (
+              <Link
+                key={label}
+                className={classes.spreadItems}
+                color="inherit"
+                underline="always"
+                target="blank"
+                {...action}
+              >
+                {label}
+              </Link>
+            )
+          })}
         </small>,
       ]}
     />

@@ -1,13 +1,14 @@
 import { ReactElement, useState, useEffect } from 'react'
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import IconButton from '@material-ui/core/IconButton'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import Button from '@material-ui/core/Button'
 import { ArrowLeft, CornerUpLeft, Search } from 'react-feather'
 import Tooltip from '@material-ui/core/Tooltip'
 import InputBase from '@material-ui/core/InputBase'
 import Typography from '@material-ui/core/Typography'
 import { Utils } from '@ethersphere/bee-js'
+import { decodeCid } from '@ethersphere/swarm-cid'
 
 import Header from '../components/Header'
 import Footer from '../components/Footer'
@@ -16,6 +17,7 @@ import Layout from '../components/Layout'
 import * as ROUTES from '../Routes'
 
 import text from '../translations'
+import { BZZ_LINK_DOMAIN } from '../constants'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -30,29 +32,41 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 )
 
-function extractSwarmHash(string: string): string | null {
-  const matches = string.match(/[a-fA-F0-9]{64,128}/)
+function extractSwarmHash(string: string): string | undefined {
+  const matches = string.match(/[a-f0-9]{64,128}/i)
 
-  return (matches && matches[0]) || null
+  return (matches && matches[0]) || undefined
 }
 
-function recognizeSwarmHash(value: string) {
-  if (value.length < 64) {
-    return value
+function extractSwarmCid(s: string): string | undefined {
+  const regexp = new RegExp(`https://(.*)\\.${BZZ_LINK_DOMAIN}`)
+  const matches = s.match(regexp)
+
+  if (!matches || !matches[1]) {
+    return
   }
 
-  const hash = extractSwarmHash(value)
+  const cid = matches[1]
+  try {
+    const decodeResult = decodeCid(cid)
 
-  if (hash) {
-    return hash
+    if (!decodeResult.type) {
+      return
+    }
+
+    return decodeResult.reference
+  } catch (e) {
+    return
   }
+}
 
-  return value
+function recognizeSwarmHash(value: string): string {
+  return extractSwarmHash(value) || extractSwarmCid(value) || value
 }
 
 export default function AccessPage(): ReactElement {
   const classes = useStyles()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const [hash, setHash] = useState<string>('')
   const [hashError, setHashError] = useState<boolean>(false)
@@ -70,7 +84,7 @@ export default function AccessPage(): ReactElement {
           leftAction={
             <IconButton
               onClick={() => {
-                history.push(ROUTES.LANDING_PAGE)
+                navigate(ROUTES.LANDING_PAGE)
               }}
             >
               <ArrowLeft strokeWidth={1} />
@@ -125,7 +139,7 @@ export default function AccessPage(): ReactElement {
                 variant="contained"
                 className={classes.button}
                 disabled={hashError}
-                onClick={() => history.push(ROUTES.ACCESS_HASH(hash))}
+                onClick={() => navigate(ROUTES.ACCESS_HASH(hash))}
                 size="large"
               >
                 <Search strokeWidth={1} />

@@ -13,7 +13,7 @@
 working. Also, no guarantees can be made about its stability, efficiency, and security at this stage.**
 
 This project is intended to be used with
-**Bee&nbsp;version&nbsp;<!-- SUPPORTED_BEE_START -->1.2.0-29eb9414<!-- SUPPORTED_BEE_END -->**. Using it with older or
+**Bee&nbsp;version&nbsp;<!-- SUPPORTED_BEE_START -->1.4.1-238867f1<!-- SUPPORTED_BEE_END -->**. Using it with older or
 newer Bee versions is not recommended and may not work. Stay up to date by joining the
 [official Discord](https://discord.gg/GU22h2utj6) and by keeping an eye on the
 [releases tab](https://github.com/ethersphere/gateway-proxy/releases).
@@ -42,10 +42,12 @@ The Gateway runs in development mode on [http://localhost:3030/](http://localhos
 
 ### Environment variables
 
-- `BEE_HOSTS` - comma separated bee API URLs through which the gateway uploads and downloads. The api to upload is
+- `REACT_APP_BEE_HOSTS` - comma separated bee API URLs through which the gateway uploads and downloads. The api to upload is
   selected at random while on download the gateway checks all the hosts (defaults to `[http://localhost:1633]`)
+- `REACT_APP_BZZ_LINK_DOMAIN` - specifies what domain of Bzz Link should be used (defaults to `bzz.link`)
 - `REACT_APP_POSTAGE_STAMP` - Postage stamp batch ID to be used for uploading (defaults to `00000...00000`
 - `REACT_APP_GATEWAY_URL` - URL on which the gateway is hosted (defaults to current window location)
+- `REACT_APP_DIRECT_DOWNLOAD_URL` - URL for a direct download of asset, used for redirecting ENS requests (defaults to `https://api.gateway.ethswarm.org/bzz/`)
 
 ## Contribute
 
