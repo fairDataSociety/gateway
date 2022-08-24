@@ -24,7 +24,7 @@ RUN env |grep 'PUBLIC\|REACT\|REDIRECT' > .env
 RUN npm run build
 
 FROM nginx:stable-alpine
-COPY --from=builder /usr/src/app/build /usr/share/nginx/html
+COPY --from=builder --chown=nobody:nogroup /usr/src/app/build /usr/share/nginx/html
 RUN apk add --no-cache bash
 RUN sed -i '/index  index.html index.htm/c\        try_files \$uri \$uri/ /index.html;' /etc/nginx/conf.d/default.conf
 EXPOSE ${PORT}
