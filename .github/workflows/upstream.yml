@@ -11,11 +11,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: master             # set the branch to merge to
+          ref: development             # set the branch to merge to
           fetch-depth: 0 
       - name: Merge Upstream
         uses: exions/merge-upstream@v1
         with:
           upstream: ethersphere/gateway-ui     # set the upstream repo
           upstream-branch: master   # set the upstream branch to merge from
-          branch: master          # set the branch to merge to
+          branch: development          # set the branch to merge to
