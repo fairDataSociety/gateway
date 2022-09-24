@@ -14,4 +14,4 @@ const url = window.location.origin
 export const GATEWAY_URL = process.env.REACT_APP_GATEWAY_URL || url
 export const DIRECT_DOWNLOAD_URL = process.env.REACT_APP_DIRECT_DOWNLOAD_URL || 'https://api.gateway.ethswarm.org/bzz/'
 export const BZZ_LINK_DOMAIN = process.env.REACT_APP_BZZ_LINK_DOMAIN || 'bzz.link'
-export const UPLOAD_SIZE_LIMIT = 10000000
+export const UPLOAD_SIZE_LIMIT = 1000000000
