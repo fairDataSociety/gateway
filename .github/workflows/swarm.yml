@@ -22,9 +22,9 @@ jobs:
         uses: actions/checkout@v3
       - name: set vars per branch
         env:
-          REACT_APP_POD_USERNAME: "${{ env.REACT_APP_POD_USERNAME }}"
-          REACT_APP_POD_NAME: "${{ env.REACT_APP_POD_NAME }}"
-          REACT_APP_FAIROS_HOSTV1: "${{ env.REACT_APP_FAIROS_HOSTV1 }}"
+          REACT_APP_POD_USERNAME: "${{ vars.REACT_APP_POD_USERNAME }}"
+          REACT_APP_POD_NAME: "${{ vars.REACT_APP_POD_NAME }}"
+          REACT_APP_FAIROS_HOSTV1: "${{ vars.REACT_APP_FAIROS_HOSTV1 }}"
           REACT_APP_POD_PASSWORD: "${{ secrets.REACT_APP_POD_PASSWORD }}"
         id: vars
         run: |
